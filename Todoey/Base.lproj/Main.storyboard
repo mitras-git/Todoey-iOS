@@ -32,7 +32,12 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="Todoey" id="djF-if-ZaR">
-                        <barButtonItem key="rightBarButtonItem" title="Item" image="plus" catalog="system" id="yiV-cy-sCJ"/>
+                        <barButtonItem key="rightBarButtonItem" title="Item" image="plus" catalog="system" id="yiV-cy-sCJ">
+                            <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <connections>
+                                <action selector="addButtonPressed:" destination="Cs8-Se-KqE" id="z9S-ch-KdA"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Way-cy-Zig" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
