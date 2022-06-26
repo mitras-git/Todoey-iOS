@@ -11,9 +11,14 @@ import UIKit
 class ToDoViewController: UITableViewController {
     
     var itemArray = ["Find Mike", "Buy Eggos", "Destory Demogorgon"]
+    
+    let defaults = UserDefaults.standard
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        if let items = defaults.array(forKey: "TodoListItemArray") as? [String] {
+            itemArray = items
+        }
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()
         appearance.backgroundColor = UIColor.systemBlue
@@ -46,7 +51,8 @@ class ToDoViewController: UITableViewController {
         
         let alert = UIAlertController(title: "Add New Todoey", message: "", preferredStyle: .alert)
         let action = UIAlertAction(title: "Add Action", style: .default) { action in
-            self.itemArray.append(textField.text ?? "ToDo Item")
+            self.itemArray.append(textField.text!)
+            self.defaults.set(self.itemArray, forKey: "TodoListItemArray")
             self.tableView.reloadData()
             print(textField.text!)
             print(self.itemArray)
