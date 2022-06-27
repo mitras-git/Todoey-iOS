@@ -11,27 +11,15 @@ import UIKit
 class ToDoViewController: UITableViewController {
     
     var itemArray = [Item]()
-    
+    let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
     let defaults = UserDefaults.standard
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        print("The user data is stored at \(dataFilePath!)")
+    
+        loadUserData()
         
-        let newItem = Item()
-        newItem.title = "Find Mike"
-        itemArray.append(newItem)
-        
-        let newItem2 = Item()
-        newItem2.title = "Buy Eggos"
-        itemArray.append(newItem2)
-        
-        let newItem3 = Item()
-        newItem3.title = "Destroy Demogorgon"
-        itemArray.append(newItem3)
-        
-//        if let items = defaults.array(forKey: "TodoListItemArray") as? [String] {
-//            itemArray = items
-//        }
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()
         appearance.backgroundColor = UIColor.systemBlue
@@ -55,6 +43,8 @@ class ToDoViewController: UITableViewController {
         
         itemArray[indexPath.row].done = !itemArray[indexPath.row].done
         
+        saveUserData()
+        
         tableView.reloadData()
         tableView.deselectRow(at: indexPath, animated: true)
     }
@@ -64,13 +54,13 @@ class ToDoViewController: UITableViewController {
         var textField = UITextField()
         
         let alert = UIAlertController(title: "Add New Todoey", message: "", preferredStyle: .alert)
-        let action = UIAlertAction(title: "Add Action", style: .default) { action in
+        let action = UIAlertAction(title: "Add Item", style: .default) { action in
             
             let newItem = Item()
             newItem.title = textField.text!
             
             self.itemArray.append(newItem)
-            self.defaults.set(self.itemArray, forKey: "TodoListItemArray")
+            self.saveUserData()
             self.tableView.reloadData()
             print(textField.text!)
             print(self.itemArray)
@@ -83,6 +73,27 @@ class ToDoViewController: UITableViewController {
         alert.addAction(action)
         present(alert, animated: true)
         
+    }
+    
+    func saveUserData() {
+        let encoder = PropertyListEncoder()
+        do {
+            let data = try encoder.encode(itemArray)
+            try data.write(to: dataFilePath!)
+        } catch {
+            print("Error printing into plist, \(error)")
+        }
+    }
+    
+    func loadUserData() {
+        if let data = try? Data(contentsOf: dataFilePath!){
+            let decoder = PropertyListDecoder()
+            do {
+                itemArray = try decoder.decode([Item].self, from: data)
+            } catch {
+                print("Eror loading data \(error)")
+            }
+        }
     }
 }
 
