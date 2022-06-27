@@ -7,18 +7,20 @@
 //
 
 import UIKit
+import CoreData
 
 class ToDoViewController: UITableViewController {
     
     var itemArray = [Item]()
     let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
     let defaults = UserDefaults.standard
+    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
     override func viewDidLoad() {
         super.viewDidLoad()
         print("The user data is stored at \(dataFilePath!)")
-    
-        loadUserData()
+        
+                loadUserData()
         
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()
@@ -56,8 +58,9 @@ class ToDoViewController: UITableViewController {
         let alert = UIAlertController(title: "Add New Todoey", message: "", preferredStyle: .alert)
         let action = UIAlertAction(title: "Add Item", style: .default) { action in
             
-            let newItem = Item()
+            let newItem = Item(context: self.context)
             newItem.title = textField.text!
+            newItem.done = false
             
             self.itemArray.append(newItem)
             self.saveUserData()
@@ -76,23 +79,19 @@ class ToDoViewController: UITableViewController {
     }
     
     func saveUserData() {
-        let encoder = PropertyListEncoder()
         do {
-            let data = try encoder.encode(itemArray)
-            try data.write(to: dataFilePath!)
+            try context.save()
         } catch {
-            print("Error printing into plist, \(error)")
+            print(error)
         }
     }
     
     func loadUserData() {
-        if let data = try? Data(contentsOf: dataFilePath!){
-            let decoder = PropertyListDecoder()
-            do {
-                itemArray = try decoder.decode([Item].self, from: data)
-            } catch {
-                print("Eror loading data \(error)")
-            }
+        let request = Item.fetchRequest()
+        do {
+        itemArray = try context.fetch(request)
+        } catch {
+            print(error)
         }
     }
 }
